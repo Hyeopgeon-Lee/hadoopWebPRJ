@@ -3,14 +3,11 @@ package kopo.poly.controller;
 import kopo.poly.controller.response.CommonResponse;
 import kopo.poly.dto.WebHdfsDTO;
 import kopo.poly.service.impl.WebHdfsService;
-import kopo.poly.util.CmmUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,17 +22,16 @@ public class WebHdfsController {
     private final String hdfsUploadDir = "/01";
 
     @PostMapping("/upload")
-    public ResponseEntity<CommonResponse<String>> upload(HttpServletRequest request) {
+    public ResponseEntity<CommonResponse<String>> upload(@RequestParam("path") String path,
+                                                         @RequestParam("content") String content) {
 
         log.info("{}.upload Start!", this.getClass().getName());
 
         try {
-
-            String path = CmmUtil.nvl(request.getParameter(hdfsUploadDir + "path"));
-            String content = CmmUtil.nvl(request.getParameter("content"));
+            log.info("path : {}, content : {}", path, content);
 
             WebHdfsDTO pDTO = new WebHdfsDTO();
-            pDTO.setPath(path);
+            pDTO.setPath(hdfsUploadDir + "/" + path);
             pDTO.setContent(content);
 
             String result = webHdfsService.upload(pDTO);
@@ -45,32 +41,31 @@ public class WebHdfsController {
             return ResponseEntity.ok(CommonResponse.of(HttpStatus.OK, "File uploaded successfully", result));
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(CommonResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed", e.getMessage()));
         }
 
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<CommonResponse<String>> deleteFile(HttpServletRequest request) {
+    public ResponseEntity<CommonResponse<String>> delete(@RequestParam("path") String path) {
 
         log.info("{}.delete Start!", this.getClass().getName());
 
         try {
-
-            String path = CmmUtil.nvl(request.getParameter("path"));
-
             WebHdfsDTO pDTO = new WebHdfsDTO();
-            pDTO.setPath(hdfsUploadDir + path);
+            pDTO.setPath(hdfsUploadDir + "/" + path);
 
             String result = webHdfsService.delete(pDTO);
             return ResponseEntity.ok(CommonResponse.of(HttpStatus.OK, "File deleted successfully", result));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, "File deletion failed", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(CommonResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, "File deletion failed", e.getMessage()));
         }
     }
 
     @GetMapping("/list")
-    public ResponseEntity<CommonResponse<String>> listFiles() {
+    public ResponseEntity<CommonResponse<String>> list() {
 
         log.info("{}.list Start!", this.getClass().getName());
 
@@ -82,7 +77,8 @@ public class WebHdfsController {
             String result = webHdfsService.list(pDTO);
             return ResponseEntity.ok(CommonResponse.of(HttpStatus.OK, "Directory listed successfully", result));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to list directory", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(CommonResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to list directory", e.getMessage()));
         }
     }
 }
