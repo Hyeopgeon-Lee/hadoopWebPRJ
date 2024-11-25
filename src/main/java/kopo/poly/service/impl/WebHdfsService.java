@@ -48,25 +48,6 @@ public class WebHdfsService implements IWebHdfsService {
     }
 
     @Override
-    public String download(WebHdfsDTO pDTO) {
-
-        log.info("{}.download Start!", this.getClass().getName());
-        log.info("pDTO : {}", pDTO);
-
-        String hdfsPath = CmmUtil.nvl(pDTO.getPath());
-
-        String uri = String.format("%s%s?op=OPEN&user.name=%s", HDFS_URI, hdfsPath, USER_NAME);
-
-        log.info("uri : {}", uri);
-
-        return webClient.get()
-                .uri(uri)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-    }
-
-    @Override
     public String delete(WebHdfsDTO pDTO) {
 
         log.info("{}.delete Start!", this.getClass().getName());

@@ -16,14 +16,6 @@ public interface IWebHdfsService {
     String upload(WebHdfsDTO pDTO);
 
     /**
-     * HDFS에서 파일을 다운로드합니다.
-     *
-     * @param pDTO 다운로드할 파일의 HDFS 경로
-     * @return 파일의 내용 (String 형태로 반환)
-     */
-    String download(WebHdfsDTO pDTO);
-
-    /**
      * HDFS에서 파일을 삭제합니다.
      *
      * @param pDTO 삭제할 파일의 HDFS 경로
